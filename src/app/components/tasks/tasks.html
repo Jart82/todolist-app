@@ -69,7 +69,7 @@
           <div *ngFor="let task of getFilteredTasks(); let i = index" class="row align-items-center mb-2">
             <div class="col-auto">
               <input type="checkbox" class="form-check-input" [(ngModel)]="task.completed"
-                (change)="toggleTaskCompletion(i)" />
+                (click)="toggleTaskCompletion(i)" />
             </div>
 
             <!-- If editing this task -->
