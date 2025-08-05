@@ -1,65 +1,105 @@
-<div class="container d-flex flex-column justify-content-center align-items-center">
-
-    <!-- head section -->
-    <div class="row">
-        <div class="col text-center">
-            <h1 class="my-3"><i class="fas fa-list me-2 fs-2 text-primary"></i> Todo List</h1>
-            <p>Stay organized and get things done</p>
-        </div>
+<div class="container py-4">
+  <!-- Header -->
+  <div class="row justify-content-center">
+    <div class="col-12 text-center">
+      <h1 class="my-3">
+        <i class="fas fa-list me-2 fs-2 text-primary"></i> Todo List
+      </h1>
+      <p class="text-muted">Stay organized and get things done</p>
     </div>
-    
-    <!-- New task section -->
-    <div class="col-8 my-4">
-        <div class="card bg-white">
-            <div class="card-body">
-                <h2><i class="fas fa-plus"></i> Add New Task</h2>
-                <div class="row">
-                    <div class="col-11">
-                        <input class="form-control" placeholder="What needs to be done?" type="text" [(ngModel)]="newTask">
-                    </div>
-                    <div class="col-1">
-                        <button class="btn btn-secondary">Add</button>
-                    </div>
-                </div>
+  </div>
+
+  <!-- New Task Section -->
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 my-3">
+      <div class="card bg-white shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3"><i class="fas fa-plus me-2"></i> Add New Task</h2>
+          <div class="row g-2">
+            <div class="col-12 col-sm-9">
+              <input class="form-control" placeholder="What needs to be done?" type="text" [(ngModel)]="newTask"
+                (keyup.enter)="addNewTask()" />
             </div>
-        </div>
-    </div>
-
-
-
-    <!-- task list section  -->
-    <div class="col-8 m-3">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <h2>Your Tasks</h2>
-              <p class="mb-0">
-                <span class="badge bg-light text-dark">{{active}} Active</span>
-                <span class="badge bg-light text-dark">{{completed}} Completed</span>
-              </p>
-            </div>
-            <div class="row">
-                <div class="btn-group btn-group-lg col-12 bg-light">
-                    <button type="button" class="btn btn-white text-secondary col-4">All({{all}})</button>
-                    <button type="button" class="btn btn-white text-secondary col-4">Active({{active}})</button>
-                    <button type="button" class="btn btn-white text-secondary col-4">Completed({{completed}})</button>
-                  </div>
-                  <div class="col-12" *ngFor="let task of taskList">
-                    <div class="col-1">
-                        <input type="checkbox" class="form-control">
-                    </div>
-                    <div class="col-10">{{task}}</div>
-                    <div class="col-1">
-                        <span>
-                            <i class="fas fa-trash"></i>
-                        </span>
-                    </div>
-                  </div>
+            <div class="col-12 col-sm-3 d-grid">
+              <button class="btn btn-secondary w-100" (click)="addNewTask()">Add</button>
             </div>
           </div>
         </div>
       </div>
-      
-    
-    
+    </div>
+  </div>
+
+  <!-- Task List Section -->
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <!-- Header -->
+          <div
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
+            <h2 class="h5 mb-2 mb-sm-0">Your Tasks</h2>
+            <p class="mb-0">
+              <span class="badge bg-light text-dark me-2">{{ active }} Active</span>
+              <span class="badge bg-light text-dark">{{ completed }} Completed</span>
+            </p>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-light text-secondary w-100" [class.active]="filter === 'all'"
+                  (click)="setFilter('all')">
+                  All ({{ all }})
+                </button>
+                <button type="button" class="btn btn-light text-secondary w-100" [class.active]="filter === 'active'"
+                  (click)="setFilter('active')">
+                  Active ({{ active }})
+                </button>
+                <button type="button" class="btn btn-light text-secondary w-100" [class.active]="filter === 'completed'"
+                  (click)="setFilter('completed')">
+                  Completed ({{ completed }})
+                </button>
+              </div>
+            </div>
+          </div>
+
+          
+          <!-- Task List -->
+          <div *ngFor="let task of getFilteredTasks(); let i = index" class="row align-items-center mb-2">
+            <div class="col-auto">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="task.completed"
+                (change)="toggleTaskCompletion(i)" />
+            </div>
+
+            <!-- If editing this task -->
+            <div class="col" *ngIf="editingIndex === i">
+              <input class="form-control" [(ngModel)]="editedText" (keyup.enter)="saveEditedTask(i)" />
+            </div>
+
+            <!-- If NOT editing -->
+            <div class="col" *ngIf="editingIndex !== i" [class.text-decoration-line-through]="task.completed">
+              {{ task.text }}
+            </div>
+
+            <div class="col-auto d-flex gap-2">
+              <!-- Edit / Save / Cancel buttons -->
+              <ng-container *ngIf="editingIndex === i; else showEditBtn">
+                <button class="btn btn-sm btn-success" (click)="saveEditedTask(i)">Save</button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="cancelEditing()">Cancel</button>
+              </ng-container>
+              <ng-template #showEditBtn>
+                <button class="btn btn-sm btn-primary" (click)="startEditing(i)">Edit</button>
+              </ng-template>
+
+              <button class="btn btn-sm btn-danger" (click)="deleteTask(i)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

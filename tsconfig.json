@@ -11,11 +11,9 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "esnext",                       // ← Change from "preserve"
-    "moduleResolution": "node",              // ← Add this
-    "baseUrl": "./",                         // ← Add this
+    "module": "preserve",
     "paths": {
-      "@angular/*": ["node_modules/@angular/*"]  // ← Add this
+      
     }
   },
   "angularCompilerOptions": {
